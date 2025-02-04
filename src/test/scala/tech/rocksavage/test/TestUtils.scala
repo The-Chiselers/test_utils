@@ -69,6 +69,9 @@ def collectCoverage(
       val verCoverageDir = new File(covDir + "/verilog")
       val cumulativeFile = verCoverageDir.toString + "/cumulative_coverage.cov"
 
+      // Make sure the directory exists
+      verCoverageDir.mkdirs()
+
       // Write the cumulative coverage to a file
       saveCoverageToFile(cumulativeCoverage.toMap, cumulativeFile)
       info(s"Cumulative coverage report written to $cumulativeFile")
