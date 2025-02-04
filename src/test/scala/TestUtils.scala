@@ -25,10 +25,12 @@ object coverageCollector {
 
 def collectCoverage(
     cov: Seq[Annotation],
-    myParams: BaseParams,
-    testName: String
+    testName: String,
+    testConfig: String,
+    coverage: Boolean,
+    covDir: String
 ): Unit = {
-  if (myParams.coverage) {
+  if (coverage) {
     val coverage = cov
       .collectFirst { case a: TestCoverage => a.counts }
       .getOrElse(Map.empty)
@@ -42,16 +44,8 @@ def collectCoverage(
       cumulativeCoverage.update(key, cumulativeCoverage.getOrElse(key, BigInt(0)) + value)
     }
 
-    val testConfig =
-      myParams.addrWidth.toString + "_" + myParams.dataWidth.toString
 
-    val buildRoot = sys.env.get("BUILD_ROOT")
-    if (buildRoot.isEmpty) {
-      println("BUILD_ROOT not set, please set and run again")
-      System.exit(1)
-    }
-
-    val verCoverageDir = new File(buildRoot.get + "/cov/verilog")
+    val verCoverageDir = new File(covDir + "/verilog")
     verCoverageDir.mkdirs()
     val coverageFile = verCoverageDir.toString + "/" + testName + "_" +
       testConfig + ".cov"
@@ -69,15 +63,10 @@ def collectCoverage(
 }
 
 
-  def saveCumulativeCoverage(myParams: BaseParams): Unit = {
-    if (myParams.coverage) {
-      val buildRoot = sys.env.get("BUILD_ROOT")
-      if (buildRoot.isEmpty) {
-        println("BUILD_ROOT not set, please set and run again")
-        System.exit(1)
-      }
+  def saveCumulativeCoverage(coverage: Boolean, covDir: String): Unit = {
+    if (coverage) {
 
-      val verCoverageDir = new File(buildRoot.get + "/cov/verilog")
+      val verCoverageDir = new File(covDir + "/verilog")
       val cumulativeFile = verCoverageDir.toString + "/cumulative_coverage.cov"
 
       // Write the cumulative coverage to a file
