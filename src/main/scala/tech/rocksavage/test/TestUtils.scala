@@ -98,28 +98,28 @@ def collectCoverage(
 object TestUtils {
 
   /** Checks coverage and writes results to a file
-    *
-    * All chiselWare-compliant cores must have tests that exercise all IO ports.
-    *
-    * Chiseltest coverage utilities are used to achieve this. Coverage data is
-    * stored in a Map. This utility processes that map file, checking that all
-    * ports are toggled and returns an error if there is a stuck-at port which
-    * indicates that the test is not sufficiently robust.
-    *
-    * The full report is written to the doc directory as part of the standard
-    * deliverables.
-    *
-    * {{{
-    * val result = checkCoverage(myCovMap,"cov.rpt")
-    * }}}
-    *
-    * @param coverage
-    *   the coverage Map containing coverage data
-    * @param file
-    *   the name of the file to write the coverage report
-    * @return
-    *   whether the coverage passed or failed
-    */
+   *
+   * All chiselWare-compliant cores must have tests that exercise all IO ports.
+   *
+   * Chiseltest coverage utilities are used to achieve this. Coverage data is
+   * stored in a Map. This utility processes that map file, checking that all
+   * ports are toggled and returns an error if there is a stuck-at port which
+   * indicates that the test is not sufficiently robust.
+   *
+   * The full report is written to the doc directory as part of the standard
+   * deliverables.
+   *
+   * {{{
+   * val result = checkCoverage(myCovMap,"cov.rpt")
+   * }}}
+   *
+   * @param coverage
+   *   the coverage Map containing coverage data
+   * @param file
+   *   the name of the file to write the coverage report
+   * @return
+   *   whether the coverage passed or failed
+   */
   def checkCoverage(coverage: Map[String, Long], file: String): Boolean = {
     val cov = new File(file)
     val covFile = new PrintWriter(cov)
@@ -154,35 +154,35 @@ object TestUtils {
   }
 
   /** Return a random data word of arbitrary length
-    *
-    * Built-in scala random number generators do not work for generating random
-    * numbers for words that are of a length not divisible by 4. This utility
-    * returns a randomized bit vector where every bit is randomized.
-    *
-    * {{{
-    * val myData = randData(19) // return a 19-bit word of random data
-    * }}}
-    *
-    * @param width
-    *   the coverage Map containing coverage data
-    * @return
-    *   a word with random data
-    */
+   *
+   * Built-in scala random number generators do not work for generating random
+   * numbers for words that are of a length not divisible by 4. This utility
+   * returns a randomized bit vector where every bit is randomized.
+   *
+   * {{{
+   * val myData = randData(19) // return a 19-bit word of random data
+   * }}}
+   *
+   * @param width
+   *   the coverage Map containing coverage data
+   * @return
+   *   a word with random data
+   */
   def randData(width: Int): UInt = {
 
-  // format: off
-  /** Generate hex choices that can be randomized for creating data
-    * patterns. The function returns fewer choices when there is data is
-    * less than a full nibble as in the example below with dataWidth =
-    * 13
-    *
-    *                 12 11 10  9  8  7  6  5  4  3  2  1  0  
-    * full nibbles       ----------- ----------- ----------- 
-    * 1 extra bit     --
-    *
-    * In this case, bit 12 can only take a 0/1 value because it is not
-    * large enough to hold any other hex value.
-    */
+    // format: off
+    /** Generate hex choices that can be randomized for creating data
+     * patterns. The function returns fewer choices when there is data is
+     * less than a full nibble as in the example below with dataWidth =
+     * 13
+     *
+     *                 12 11 10  9  8  7  6  5  4  3  2  1  0
+     * full nibbles       ----------- ----------- -----------
+     * 1 extra bit     --
+     *
+     * In this case, bit 12 can only take a 0/1 value because it is not
+     * large enough to hold any other hex value.
+     */
     // format: on
     def getHexString(x: Int): String = {
       val hexStringRem0 = "0123456789abcdef" // no extra bits
@@ -208,27 +208,27 @@ object TestUtils {
 
     // format: off
     /** Generate two sets of random strings used for generation of the
-      * randomized data. One used for full nibbles the other for partial
-      * nibbles.
-      * 
-      * datawidth = 13
-      * randFullNibble = "abc"
-      * randPartialNibble = "1"
-      */
-      // format: on
+     * randomized data. One used for full nibbles the other for partial
+     * nibbles.
+     *
+     * datawidth = 13
+     * randFullNibble = "abc"
+     * randPartialNibble = "1"
+     */
+    // format: on
 
     val randFullNibble = getHexString(0)
     val randPartialNibble = getHexString(numLeftOverBits)
 
     // format: off
     /** Assemble the test data word by creating two Seqs. One consists of
-      * full nibbles, the second is for the last partial nibble. The
-      * partial nibble value is prepended to the full list of nibbles.
-      * 
-      * fullNibbleSeq = Seq[List[String]] = List(List(a, b, c))
-      * partialNibbleSeq = Seq[List[String]] = List(List(1))
-      * assembleSeq = Seq[List[String]] = List(List(1,a,b,c))
-      */
+     * full nibbles, the second is for the last partial nibble. The
+     * partial nibble value is prepended to the full list of nibbles.
+     *
+     * fullNibbleSeq = Seq[List[String]] = List(List(a, b, c))
+     * partialNibbleSeq = Seq[List[String]] = List(List(1))
+     * assembleSeq = Seq[List[String]] = List(List(1,a,b,c))
+     */
     // format: on
 
     val fullNibbleSeq = Seq.fill(width / 4) {
