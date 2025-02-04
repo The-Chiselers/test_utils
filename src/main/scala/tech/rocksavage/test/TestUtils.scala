@@ -96,7 +96,7 @@ def collectCoverage(
 
 /** Collection of chiselWare utilities */
 object TestUtils {
-
+/*
   /** Checks coverage and writes results to a file
    *
    * All chiselWare-compliant cores must have tests that exercise all IO ports.
@@ -152,7 +152,7 @@ object TestUtils {
     covFile.close()
     return (stuckAtZero | stuckAtOne)
   }
-
+*/
   /** Return a random data word of arbitrary length
    *
    * Built-in scala random number generators do not work for generating random
