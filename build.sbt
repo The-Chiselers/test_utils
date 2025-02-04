@@ -7,9 +7,6 @@ ThisBuild / organizationName := "Rocksavage Technology"
 
 Test / parallelExecution := false
 
-val chiselVersion   = "5.3.0"
-val scalafmtVersion = "2.5.0"
-
 lazy val root = (project in file("."))
     .settings(
       name                   := "test_utils",
