@@ -13,7 +13,6 @@ import scala.collection.mutable
 import firrtl2.AnnotationSeq
 import firrtl2.annotations.Annotation // Correct Annotation type for firrtl2
 import firrtl2.options.TargetDirAnnotation
-import TestUtils.checkCoverage
 import TestUtils.randData
 import chisel3.util._
 import chiseltest._
