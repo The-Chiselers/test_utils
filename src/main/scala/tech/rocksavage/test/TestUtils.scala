@@ -52,11 +52,11 @@ def collectCoverage(
     // Save individual test coverage
     saveCoverageToFile(bigIntCoverage, coverageFile)
 
-    val stuckAtFault = TestUtils.checkCoverage(bigIntCoverage.map { case (k, v) => k -> v.toLong }.toMap, coverageFile)
-    if (stuckAtFault)
-      println(
-        s"WARNING: At least one IO port did not toggle -- see $coverageFile"
-      )
+    // val stuckAtFault = TestUtils.checkCoverage(bigIntCoverage.map { case (k, v) => k -> v.toLong }.toMap, coverageFile)
+    // if (stuckAtFault)
+    //   println(
+    //     s"WARNING: At least one IO port did not toggle -- see $coverageFile"
+    //   )
     info(s"Verilog Coverage report written to $coverageFile")
   }
 }
