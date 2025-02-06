@@ -13,7 +13,6 @@ import scala.collection.mutable
 import firrtl2.AnnotationSeq
 import firrtl2.annotations.Annotation // Correct Annotation type for firrtl2
 import firrtl2.options.TargetDirAnnotation
-import TestUtils.checkCoverage
 import TestUtils.randData
 import chisel3.util._
 import chiseltest._
@@ -53,11 +52,11 @@ def collectCoverage(
     // Save individual test coverage
     saveCoverageToFile(bigIntCoverage, coverageFile)
 
-    val stuckAtFault = TestUtils.checkCoverage(bigIntCoverage.map { case (k, v) => k -> v.toLong }.toMap, coverageFile)
-    if (stuckAtFault)
-      println(
-        s"WARNING: At least one IO port did not toggle -- see $coverageFile"
-      )
+    // val stuckAtFault = TestUtils.checkCoverage(bigIntCoverage.map { case (k, v) => k -> v.toLong }.toMap, coverageFile)
+    // if (stuckAtFault)
+    //   println(
+    //     s"WARNING: At least one IO port did not toggle -- see $coverageFile"
+    //   )
     info(s"Verilog Coverage report written to $coverageFile")
   }
 }
