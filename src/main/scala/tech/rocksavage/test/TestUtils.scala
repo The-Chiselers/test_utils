@@ -92,11 +92,12 @@ def collectCoverage(
   private def info(message: String): Unit = {
     println(message)
   }
+
 }
 
 /** Collection of chiselWare utilities */
 object TestUtils {
-/*
+
   /** Checks coverage and writes results to a file
    *
    * All chiselWare-compliant cores must have tests that exercise all IO ports.
@@ -152,7 +153,42 @@ object TestUtils {
     covFile.close()
     return (stuckAtZero | stuckAtOne)
   }
-*/
+
+  def coverageCollection(
+    cov: Seq[Annotation],
+    myParams: BaseParams,
+    testName: String
+    ): Unit = {
+    if (myParams.coverage) {
+      val coverage = cov
+        .collectFirst { case a: TestCoverage => a.counts }
+        .get
+        .toMap
+
+      val testConfig =
+        myParams.addrWidth.toString + "_" + myParams.dataWidth.toString
+
+      val buildRoot = sys.env.get("BUILD_ROOT")
+      if (buildRoot.isEmpty) {
+        println("BUILD_ROOT not set, please set and run again")
+        System.exit(1)
+      }
+      // path join
+      val scalaCoverageDir = new File(buildRoot.get + "/cov/scala")
+      val verCoverageDir = new File(buildRoot.get + "/cov/verilog")
+      verCoverageDir.mkdirs()
+      val coverageFile = verCoverageDir.toString + "/" + testName + "_" +
+        testConfig + ".cov"
+
+      val stuckAtFault = checkCoverage(coverage, coverageFile)
+      if (stuckAtFault)
+        println(
+          s"WARNING: At least one IO port did not toggle -- see $coverageFile"
+        )
+      info(s"Verilog Coverage report written to $coverageFile")
+    }
+  }
+
   /** Return a random data word of arbitrary length
    *
    * Built-in scala random number generators do not work for generating random
