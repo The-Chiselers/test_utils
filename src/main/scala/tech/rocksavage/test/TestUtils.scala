@@ -160,14 +160,16 @@ object TestUtils {
     coverage: Boolean,
     covDir: String
     ): Unit = {
-    if (myParams.coverage) {
+    //if (myParams.coverage) {
       val coverage = cov
         .collectFirst { case a: TestCoverage => a.counts }
         .get
         .toMap
 
-      val testConfig =
-        myParams.addrWidth.toString + "_" + myParams.dataWidth.toString
+      val verCoverageDir = new File(covDir + "/verilog")
+      verCoverageDir.mkdirs()
+      val coverageFile = verCoverageDir.toString + "/" + testName + "_" +
+        testConfig + ".cov"
 
       val buildRoot = sys.env.get("BUILD_ROOT")
       if (buildRoot.isEmpty) {
@@ -175,8 +177,8 @@ object TestUtils {
         System.exit(1)
       }
       // path join
-      val scalaCoverageDir = new File(buildRoot.get + "/cov/scala")
-      val verCoverageDir = new File(buildRoot.get + "/cov/verilog")
+      //val scalaCoverageDir = new File(buildRoot.get + "/cov/scala")
+      //val verCoverageDir = new File(buildRoot.get + "/cov/verilog")
       verCoverageDir.mkdirs()
       val coverageFile = verCoverageDir.toString + "/" + testName + "_" +
         testConfig + ".cov"
@@ -187,7 +189,7 @@ object TestUtils {
           s"WARNING: At least one IO port did not toggle -- see $coverageFile"
         )
       info(s"Verilog Coverage report written to $coverageFile")
-    }
+    //}
   }
 
   /** Return a random data word of arbitrary length
