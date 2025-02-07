@@ -155,8 +155,10 @@ object TestUtils {
 
   def coverageCollection(
     cov: Seq[Annotation],
-    myParams: BaseParams,
-    testName: String
+    testName: String,
+    testConfig: String,
+    coverage: Boolean,
+    covDir: String
     ): Unit = {
     if (myParams.coverage) {
       val coverage = cov
