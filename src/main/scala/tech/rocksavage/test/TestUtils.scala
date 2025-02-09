@@ -82,26 +82,32 @@ object coverageCollector {
     }
   }
 
-  private def saveCoverageToFileWithTogglePercentage(coverage: Map[String, BigInt], filePath: String): Unit = {
-    val writer = new PrintWriter(new File(filePath))
-    try {
-      for ((key, value) <- coverage) {
-        writer.println(s"$key: $value")
+private def saveCoverageToFileWithTogglePercentage(coverage: Map[String, BigInt], filePath: String): Unit = {
+  val writer = new PrintWriter(new File(filePath))
+  try {
+    for ((key, value) <- coverage) {
+      // Check if the port is one of the specified ones and its value is 0
+      if ((key.contains("PADDR") || key.contains("PWDATA") || key.contains("PRDATA")) && value == 0) {
+        writer.println(s"$key: $value (Excluded)")  // Mark as Excluded
+      } else {
+        writer.println(s"$key: $value")  // Otherwise, just print the value
       }
-      
-      // Exclude paddr, pwdata, and prdata if they are 0
-      val filteredCoverage = coverage.filterNot {
-        case (key, value) => (key.contains("PADDR") || key.contains("PWDATA") || key.contains("PRDATA")) && value == 0
-      }
-      val toggledPorts = filteredCoverage.count(_._2 > 0)
-      val totalPorts = filteredCoverage.size
-      val togglePercentage = if (totalPorts > 0) (toggledPorts.toDouble / totalPorts) * 100 else 0.0
-      
-      writer.println(f"Final Toggle Percentage: $togglePercentage%.2f%%")
-    } finally {
-      writer.close()
     }
+    
+    // Exclude paddr, pwdata, and prdata if they are 0 for toggle percentage calculation
+    val filteredCoverage = coverage.filterNot {
+      case (key, value) => (key.contains("PADDR") || key.contains("PWDATA") || key.contains("PRDATA")) && value == 0
+    }
+    val toggledPorts = filteredCoverage.count(_._2 > 0)
+    val totalPorts = filteredCoverage.size
+    val togglePercentage = if (totalPorts > 0) (toggledPorts.toDouble / totalPorts) * 100 else 0.0
+    
+    writer.println(f"Final Toggle Percentage: $togglePercentage%.2f%%")
+  } finally {
+    writer.close()
   }
+}
+
 
   private def info(message: String): Unit = {
     println(message)
