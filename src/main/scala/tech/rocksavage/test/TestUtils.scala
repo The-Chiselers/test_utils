@@ -95,39 +95,6 @@ object coverageCollector {
   }
 }
 
-
-  def saveCumulativeCoverage(coverage: Boolean, covDir: String): Unit = {
-    if (coverage) {
-
-      val verCoverageDir = new File(covDir + "/verilog")
-      val cumulativeFile = verCoverageDir.toString + "/cumulative_coverage.cov"
-
-      // Make sure the directory exists
-      verCoverageDir.mkdirs()
-
-      // Write the cumulative coverage to a file
-      saveCoverageToFile(cumulativeCoverage.toMap, cumulativeFile)
-      info(s"Cumulative coverage report written to $cumulativeFile")
-    }
-  }
-
-  private def saveCoverageToFile(coverage: Map[String, BigInt], filePath: String): Unit = {
-    val writer = new PrintWriter(new File(filePath))
-    try {
-      for ((key, value) <- coverage) {
-        writer.println(s"$key: $value")
-      }
-    } finally {
-      writer.close()
-    }
-  }
-
-  private def info(message: String): Unit = {
-    println(message)
-  }
-
-}
-
 /** Collection of chiselWare utilities */
 object TestUtils {
 
