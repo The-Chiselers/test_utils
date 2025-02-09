@@ -284,4 +284,38 @@ object TestUtils {
     return randData
   }
 
+    // Recursively cover a Data (Bundle, Vec, or leaf).
+    // For a leaf that is non-Bool, we convert it to a Vec of Bools and then cover each bit.
+    def coverAll(sig: Data, namePrefix: String = ""): Unit = sig match {
+        // If the signal is a Bundle, iterate through each element.
+        case b: Bundle =>
+            b.elements.foreach { case (fieldName, child) =>
+                val fullName = if (namePrefix.isEmpty) fieldName else s"${namePrefix}_$fieldName"
+                coverAll(child, fullName)
+            }
+        // If the signal is a Vec, iterate through each element.
+        case v: Vec[_] =>
+            for (i <- 0 until v.length) {
+                coverAll(v(i), s"${namePrefix}_$i")
+            }
+        // Otherwise, assume it is a leaf.
+        // For a Bool we directly cover, for any other Bits we convert to a Vec of Bool using asBools.
+        case leaf =>
+            coverLeaf(leaf, namePrefix)
+    }
+
+    // Helper function for covering leaf signals.
+    // If leaf is a Bool, use it directly; if it's some other Bits (UInt, SInt), convert to a Vec of Bools.
+    def coverLeaf(leaf: Data, name: String): Unit = leaf match {
+        case b: Bool =>
+            cover(b).suggestName(name)
+        case bits: Bits =>
+            // Convert the Bits to a Seq of Bool signals and wrap in a Vec,
+            // then recursively cover each bit.
+            val vecBools = VecInit(bits.asBools)
+            coverAll(vecBools, name)
+        case _ =>
+            println(s"Warning: signal $name of type ${leaf.getClass.getSimpleName} is not coverable")
+    }
+
 }
