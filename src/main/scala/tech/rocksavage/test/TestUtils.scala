@@ -91,7 +91,7 @@ object coverageCollector {
       
       // Exclude paddr, pwdata, and prdata if they are 0
       val filteredCoverage = coverage.filterNot {
-        case (key, value) => (key == "paddr" || key == "pwdata" || key == "prdata") && value == 0
+        case (key, value) => (key.contains("PADDR") || key.contains("PWDATA") || key.contains("PRDATA")) && value == 0
       }
       val toggledPorts = filteredCoverage.count(_._2 > 0)
       val totalPorts = filteredCoverage.size
