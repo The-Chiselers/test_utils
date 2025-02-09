@@ -41,9 +41,9 @@ object coverageCollector {
 
       val verCoverageDir = new File(covDir + "/verilog")
       verCoverageDir.mkdirs()
-      val coverageFile = s"$verCoverageDir/$testName_$testConfig.cov"
+      val coverageFile = s"$verCoverageDir/${testName}_$testConfig.cov"
 
-      saveCoverageToFile(bigIntCoverage, coverageFile)
+      saveCoverageToFile(bigIntCoverage.toMap, coverageFile)
       info(s"Verilog Coverage report written to $coverageFile")
     }
   }
