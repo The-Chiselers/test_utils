@@ -22,42 +22,76 @@ import chiseltest.simulator._
 object coverageCollector {
   private val cumulativeCoverage: mutable.Map[String, BigInt] = mutable.Map()
 
-def collectCoverage(
-    cov: Seq[Annotation],
-    testName: String,
-    testConfig: String,
-    coverage: Boolean,
-    covDir: String
-): Unit = {
-  if (coverage) {
-    val coverage = cov
-      .collectFirst { case a: TestCoverage => a.counts }
-      .getOrElse(Map.empty)
-      .toMap
+  def collectCoverage(
+      cov: Seq[chiseltest.coverage.TestCoverage],
+      testName: String,
+      testConfig: String,
+      coverage: Boolean,
+      covDir: String
+  ): Unit = {
+    if (coverage) {
+      val bigIntCoverage = cov
+        .collectFirst { case a: TestCoverage => a.counts }
+        .getOrElse(Map.empty)
+        .map { case (key, value) => key -> BigInt(value) }
 
-    // Convert Map[String, Long] to Map[String, BigInt]
-    val bigIntCoverage = coverage.map { case (key, value) => key -> BigInt(value) }
+      for ((key, value) <- bigIntCoverage) {
+        cumulativeCoverage.update(key, cumulativeCoverage.getOrElse(key, BigInt(0)) + value)
+      }
 
-    // Merge the test coverage into the cumulative coverage
-    for ((key, value) <- bigIntCoverage) {
-      cumulativeCoverage.update(key, cumulativeCoverage.getOrElse(key, BigInt(0)) + value)
+      val verCoverageDir = new File(covDir + "/verilog")
+      verCoverageDir.mkdirs()
+      val coverageFile = s"$verCoverageDir/$testName_$testConfig.cov"
+
+      saveCoverageToFile(bigIntCoverage, coverageFile)
+      info(s"Verilog Coverage report written to $coverageFile")
     }
+  }
 
+  def saveCumulativeCoverage(coverage: Boolean, covDir: String): Unit = {
+    if (coverage) {
+      val verCoverageDir = new File(covDir + "/verilog")
+      val cumulativeFile = s"$verCoverageDir/cumulative_coverage.cov"
+      verCoverageDir.mkdirs()
+      saveCoverageToFileWithTogglePercentage(cumulativeCoverage.toMap, cumulativeFile)
+      info(s"Cumulative coverage report written to $cumulativeFile")
+    }
+  }
 
-    val verCoverageDir = new File(covDir + "/verilog")
-    verCoverageDir.mkdirs()
-    val coverageFile = verCoverageDir.toString + "/" + testName + "_" +
-      testConfig + ".cov"
+  private def saveCoverageToFile(coverage: Map[String, BigInt], filePath: String): Unit = {
+    val writer = new PrintWriter(new File(filePath))
+    try {
+      for ((key, value) <- coverage) {
+        writer.println(s"$key: $value")
+      }
+    } finally {
+      writer.close()
+    }
+  }
 
-    // Save individual test coverage
-    saveCoverageToFile(bigIntCoverage, coverageFile)
+  private def saveCoverageToFileWithTogglePercentage(coverage: Map[String, BigInt], filePath: String): Unit = {
+    val writer = new PrintWriter(new File(filePath))
+    try {
+      for ((key, value) <- coverage) {
+        writer.println(s"$key: $value")
+      }
+      
+      // Exclude paddr, pwdata, and prdata if they are 0
+      val filteredCoverage = coverage.filterNot {
+        case (key, value) => (key == "paddr" || key == "pwdata" || key == "prdata") && value == 0
+      }
+      val toggledPorts = filteredCoverage.count(_._2 > 0)
+      val totalPorts = filteredCoverage.size
+      val togglePercentage = if (totalPorts > 0) (toggledPorts.toDouble / totalPorts) * 100 else 0.0
+      
+      writer.println(f"Final Toggle Percentage: $togglePercentage%.2f%%")
+    } finally {
+      writer.close()
+    }
+  }
 
-    // val stuckAtFault = TestUtils.checkCoverage(bigIntCoverage.map { case (k, v) => k -> v.toLong }.toMap, coverageFile)
-    // if (stuckAtFault)
-    //   println(
-    //     s"WARNING: At least one IO port did not toggle -- see $coverageFile"
-    //   )
-    info(s"Verilog Coverage report written to $coverageFile")
+  private def info(message: String): Unit = {
+    println(message)
   }
 }
 
@@ -160,7 +194,7 @@ object TestUtils {
     coverage: Boolean,
     covDir: String
     ): Unit = {
-    //if (myParams.coverage) {
+    if (coverage) {
       val coverage = cov
         .collectFirst { case a: TestCoverage => a.counts }
         .get
@@ -189,7 +223,7 @@ object TestUtils {
           s"WARNING: At least one IO port did not toggle -- see $coverageFile"
         )
       //info(s"Verilog Coverage report written to $coverageFile")
-    //}
+    }
   }
 
   /** Return a random data word of arbitrary length
