@@ -23,27 +23,40 @@ object coverageCollector {
   private val cumulativeCoverage: mutable.Map[String, BigInt] = mutable.Map()
 
   def collectCoverage(
-      cov: Seq[chiseltest.coverage.TestCoverage],
+      cov: Seq[Annotation],
       testName: String,
       testConfig: String,
       coverage: Boolean,
       covDir: String
   ): Unit = {
     if (coverage) {
-      val bigIntCoverage = cov
+      val coverage = cov
         .collectFirst { case a: TestCoverage => a.counts }
         .getOrElse(Map.empty)
-        .map { case (key, value) => key -> BigInt(value) }
+        .toMap
 
+      // Convert Map[String, Long] to Map[String, BigInt]
+      val bigIntCoverage = coverage.map { case (key, value) => key -> BigInt(value) }
+
+      // Merge the test coverage into the cumulative coverage
       for ((key, value) <- bigIntCoverage) {
         cumulativeCoverage.update(key, cumulativeCoverage.getOrElse(key, BigInt(0)) + value)
       }
 
+
       val verCoverageDir = new File(covDir + "/verilog")
       verCoverageDir.mkdirs()
-      val coverageFile = s"$verCoverageDir/${testName}_$testConfig.cov"
+      val coverageFile = verCoverageDir.toString + "/" + testName + "_" +
+        testConfig + ".cov"
 
-      saveCoverageToFile(bigIntCoverage.toMap, coverageFile)
+      // Save individual test coverage
+      saveCoverageToFile(bigIntCoverage, coverageFile)
+
+      // val stuckAtFault = TestUtils.checkCoverage(bigIntCoverage.map { case (k, v) => k -> v.toLong }.toMap, coverageFile)
+      // if (stuckAtFault)
+      //   println(
+      //     s"WARNING: At least one IO port did not toggle -- see $coverageFile"
+      //   )
       info(s"Verilog Coverage report written to $coverageFile")
     }
   }
