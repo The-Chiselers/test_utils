@@ -168,8 +168,8 @@ object TestUtils {
 
       val verCoverageDir = new File(covDir + "/verilog")
       verCoverageDir.mkdirs()
-      val coverageFile = verCoverageDir.toString + "/" + testName + "_" +
-        testConfig + ".cov"
+      //val coverageFile = verCoverageDir.toString + "/" + testName + "_" +
+      //  testConfig + ".cov"
 
       val buildRoot = sys.env.get("BUILD_ROOT")
       if (buildRoot.isEmpty) {
@@ -188,7 +188,7 @@ object TestUtils {
         println(
           s"WARNING: At least one IO port did not toggle -- see $coverageFile"
         )
-      info(s"Verilog Coverage report written to $coverageFile")
+      //info(s"Verilog Coverage report written to $coverageFile")
     //}
   }
 
