@@ -87,7 +87,7 @@ private def saveCoverageToFileWithTogglePercentage(coverage: Map[String, BigInt]
   try {
     for ((key, value) <- coverage) {
       // Check if the port is one of the specified ones and its value is 0
-      if ((key.contains("PADDR") || key.contains("PWDATA") || key.contains("PRDATA")) && value == 0) {
+      if ((key.contains("ADDR") || key.contains("PWDATA") || key.contains("PRDATA")) && value == 0) {
         writer.println(s"$key: $value (Excluded)")  // Mark as Excluded
       } else {
         writer.println(s"$key: $value")  // Otherwise, just print the value
